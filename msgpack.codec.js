@@ -44,15 +44,25 @@ function msgpackpack(data,       // @param Mix:
 }
 
 // msgpack.unpack
-function msgpackunpack(data) { // @param BinaryString/ByteArray:
-                               // @return Mix/undefined:
-                               //       undefined is error return
+function msgpackunpack(data,        // @param BinaryString/ByteArray:
+                       off) {       // @param offset of data (default: 0)
+
+                                    // @return { obj, off }
+                                    //           obj: Mix/undefined:
+                                    //           undefined is error return
+                                    //           off: updated offset position
     //  [1][String to mix]    msgpack.unpack("...") -> {}
     //  [2][ByteArray to mix] msgpack.unpack([...]) -> {}
 
     _buf = typeof data === "string" ? toByteArray(data) : data;
-    _idx = -1;
-    return decode(); // mix or undefined
+    if (off == null) {
+        _idx = -1;
+    }
+    else {
+        _idx = off - 1;
+    }
+    var obj = decode(); // mix or undefined
+    return { "obj": obj, "off": _idx + 1 }
 }
 
 // inner - encoder
