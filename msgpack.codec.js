@@ -351,7 +351,7 @@ function decode() { // @return Mix:
                                           : byteArrayToByteString(ary);
     // 0xc6: bin32, 0xc5: bin16, 0xc4: bin8
     case 0xc6:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
-    case 0xc5:  num += buf[++_idx] << 8)
+    case 0xc5:  num += buf[++_idx] << 8;
     case 0xc4:  num += buf[++_idx];
                 var ret = buf.slice(_idx, _idx + num);
                 _idx += num;
