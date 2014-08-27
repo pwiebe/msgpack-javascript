@@ -334,9 +334,10 @@ function decode() { // @return Mix:
                 return num < 0x8000 ? num : num - 0x10000; // 0x8000 * 2
     case 0xd0:  num  =  buf[++_idx];
                 return num < 0x80 ? num : num - 0x100; // 0x80 * 2
-    // 0xdb: raw32, 0xda: raw16, 0xa0: raw ( string )
-    case 0xdb:  num +=  buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
-    case 0xda:  num += (buf[++_idx] << 8)       +  buf[++_idx];
+    // 0xdb: str32, 0xda: str16, 0xd9: str8, 0xa0: raw ( string )
+    case 0xdb:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xda:  num += buf[++_idx] << 8;
+    case 0xd9:  num += buf[++_idx];
     case 0xa0:  // utf8.decode
                 for (ary = [], i = _idx, iz = i + num; i < iz; ) {
                     c = buf[++i]; // lead byte
@@ -348,6 +349,13 @@ function decode() { // @return Mix:
                 _idx = i;
                 return ary.length < 10240 ? _toString.apply(null, ary)
                                           : byteArrayToByteString(ary);
+    // 0xc6: bin32, 0xc5: bin16, 0xc4: bin8
+    case 0xc6:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
+    case 0xc5:  num += buf[++_idx] << 8)
+    case 0xc4:  num += buf[++_idx];
+                var ret = buf.slice(_idx, _idx + num);
+                _idx += num;
+                return ret;
     // 0xdf: map32, 0xde: map16, 0x80: map
     case 0xdf:  num +=  buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
     case 0xde:  num += (buf[++_idx] << 8)       +  buf[++_idx];
