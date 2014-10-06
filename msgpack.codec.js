@@ -40,7 +40,7 @@ function msgpackpack(data,       // @param Mix:
 
     return _error ? false
                   : toString ? byteArrayToByteString(byteArray)
-                             : byteArray;
+                             : new Uint8Array(byteArray);
 }
 
 // msgpack.unpack
@@ -353,7 +353,7 @@ function decode() { // @return Mix:
     case 0xc6:  num += buf[++_idx] * 0x1000000 + (buf[++_idx] << 16);
     case 0xc5:  num += buf[++_idx] << 8;
     case 0xc4:  num += buf[++_idx];
-                var ret = buf.subarray(++_idx);
+                var ret = buf.subarray(_idx+1, _idx+1+num);
                 _idx += num;
                 return ret;
     // 0xdf: map32, 0xde: map16, 0x80: map
