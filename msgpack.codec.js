@@ -202,7 +202,7 @@ function encode(rv,      // @param ByteArray: result
             if (mix instanceof Uint8Array) {
 	            size = mix.length;
 				if (size < 256) {
-					rv.push(0xc4);
+					rv.push(0xc4, size);
 				} else if (size < 0x10000) { // 16
 				    rv.push(0xc5, size >> 8, size & 0xff);
 				} else if (size < 0x100000000) { // 32
