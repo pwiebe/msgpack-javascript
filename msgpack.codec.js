@@ -199,19 +199,32 @@ function encode(rv,      // @param ByteArray: result
                 _error = 1; // CYCLIC_REFERENCE_ERROR
                 return rv = []; // clear
             }
-            if (_isArray(mix)) {
+            if (mix instanceof Uint8Array) {
+	            size = mix.length;
+				if (size < 256) {
+					rv.push(0xc4);
+				} else if (size < 0x10000) { // 16
+				    rv.push(0xc5, size >> 8, size & 0xff);
+				} else if (size < 0x100000000) { // 32
+				    rv.push(0xc6, size >>> 24, (size >> 16) & 0xff,
+				                               (size >>  8) & 0xff, size & 0xff);
+				}
+				for (i=0; i < size; ++i) {
+					rv.push(mix[i])
+				}
+            } else if (_isArray(mix)) {
                 size = mix.length;
-                if (size < 16) {
-                    rv.push(0x90 + size);
-                } else if (size < 0x10000) { // 16
-                    rv.push(0xdc, size >> 8, size & 0xff);
-                } else if (size < 0x100000000) { // 32
-                    rv.push(0xdd, size >>> 24, (size >> 16) & 0xff,
-                                               (size >>  8) & 0xff, size & 0xff);
-                }
-                for (i = 0; i < size; ++i) {
-                    encode(rv, mix[i], depth);
-                }
+	            if (size < 16) {
+	                rv.push(0x90 + size);
+	            } else if (size < 0x10000) { // 16
+	                rv.push(0xdc, size >> 8, size & 0xff);
+	            } else if (size < 0x100000000) { // 32
+	                rv.push(0xdd, size >>> 24, (size >> 16) & 0xff,
+	                                           (size >>  8) & 0xff, size & 0xff);
+	            }
+	            for (i = 0; i < size; ++i) {
+	                encode(rv, mix[i], depth);
+	            }
             } else { // hash
                 // http://d.hatena.ne.jp/uupaa/20101129
                 pos = rv.length; // keep rewrite position
